@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OPeN STAR · AI 创意工作室</title>
+  <style>
+    :root {
+      --brand: #a2ff00;
+      --brand-2: #bfff33;
+      --ink: #1a1a1a;
+      --ink-2: #2a2a2a;
+      --line: #3a3a3a;
+      --muted: #9a9a9a;
+      --danger: #ff6b6b;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Microsoft YaHei", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--ink);
+      color: #f2f2f2;
+      line-height: 1.5;
+    }
+    a { color: var(--brand); }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      background: rgba(26, 26, 26, 0.92);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+    .logo {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: var(--brand); color: var(--ink);
+      display: grid; place-items: center; font-weight: 800; font-size: 18px;
+    }
+    header h1 { font-size: 18px; margin: 0; font-weight: 700; letter-spacing: .3px; }
+    header .sub { font-size: 12px; color: var(--muted); }
+    main { max-width: 1080px; margin: 0 auto; padding: 24px; }
+
+    .card {
+      background: var(--ink-2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card h2 { margin: 0 0 4px; font-size: 15px; }
+    .card .hint { font-size: 12px; color: var(--muted); margin: 0 0 14px; }
+
+    label { display: block; font-size: 13px; margin: 0 0 6px; color: #d8d8d8; font-weight: 600; }
+    input[type="text"], input[type="password"], textarea, select {
+      width: 100%;
+      background: #141414;
+      border: 1px solid var(--line);
+      color: #f2f2f2;
+      border-radius: 10px;
+      padding: 11px 12px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none; border-color: var(--brand);
+    }
+    textarea { resize: vertical; min-height: 84px; }
+    .row { display: flex; gap: 14px; flex-wrap: wrap; }
+    .row > .field { flex: 1; min-width: 150px; }
+    .field { margin-bottom: 14px; }
+
+    .btn {
+      background: var(--brand); color: var(--ink);
+      border: none; border-radius: 10px;
+      padding: 12px 22px; font-size: 14px; font-weight: 800;
+      cursor: pointer; transition: filter .15s, transform .05s;
+    }
+    .btn:hover { filter: brightness(1.08); }
+    .btn:active { transform: translateY(1px); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .btn.ghost { background: transparent; color: var(--brand); border: 1px solid var(--brand); }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+    .tab {
+      flex: 1; text-align: center; padding: 12px; border-radius: 10px;
+      background: var(--ink-2); border: 1px solid var(--line);
+      cursor: pointer; font-weight: 700; font-size: 14px; color: #d8d8d8;
+    }
+    .tab.active { background: var(--brand); color: var(--ink); border-color: var(--brand); }
+
+    .drop {
+      border: 1px dashed var(--line); border-radius: 10px;
+      padding: 16px; text-align: center; font-size: 13px; color: var(--muted);
+      cursor: pointer;
+    }
+    .drop.has { border-style: solid; border-color: var(--brand); color: #d8d8d8; }
+    .thumb { max-width: 120px; max-height: 120px; border-radius: 8px; margin-top: 10px; }
+
+    .status {
+      font-size: 13px; padding: 10px 12px; border-radius: 10px;
+      background: #141414; border: 1px solid var(--line); margin-top: 14px;
+      display: none;
+    }
+    .status.show { display: block; }
+    .status.err { border-color: var(--danger); color: #ffb3b3; }
+    .bar { height: 6px; background: #141414; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+    .bar > span { display: block; height: 100%; width: 0%; background: var(--brand); transition: width .3s; }
+
+    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+    .result { background: #141414; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+    .result img, .result video { width: 100%; display: block; background: #000; }
+    .result .meta { padding: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .result .meta small { color: var(--muted); font-size: 11px; word-break: break-all; }
+    .dl { font-size: 12px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+
+    .warn { font-size: 12px; color: var(--muted); }
+    .warn b { color: var(--brand-2); }
+    details summary { cursor: pointer; font-size: 13px; color: var(--brand); }
+    .spinner { display:inline-block; width:14px; height:14px; border:2px solid var(--line); border-top-color: var(--brand); border-radius:50%; animation: spin .8s linear infinite; vertical-align:-2px; margin-right:6px;}
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">OS</div>
+    <div>
+      <h1>OPeN STAR · AI 创意工作室</h1>
+      <div class="sub">文生图 · 图生图 · 文生视频 · 图生视频 — 由 OpenAI / Sora 驱动</div>
+    </div>
+  </header>
+
+  <main>
+    <!-- 设置 -->
+    <div class="card">
+      <h2>① API 设置</h2>
+      <p class="hint">密钥仅保存在你本地浏览器（localStorage），不会上传到任何服务器。</p>
+      <div class="field">
+        <label for="apiKey">OpenAI API Key</label>
+        <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off" />
+      </div>
+      <details>
+        <summary>高级：自定义 API 地址（中转 / 代理）</summary>
+        <div class="field" style="margin-top:10px;">
+          <label for="baseUrl">Base URL</label>
+          <input type="text" id="baseUrl" placeholder="https://api.openai.com/v1" />
+          <p class="warn" style="margin-top:6px;">国内网络若无法直连 api.openai.com，可在此填入你的中转地址（需兼容 OpenAI 接口）。</p>
+        </div>
+      </details>
+      <p class="warn">
+        ⚠️ <b>安全提示</b>：这是纯前端页面，密钥会随请求从你的浏览器直接发往 OpenAI。请仅在你个人/内部电脑上使用，
+        切勿把填了密钥的页面公开分享。生产环境建议改为后端代理保管密钥。
+      </p>
+    </div>
+
+    <!-- 标签页 -->
+    <div class="tabs">
+      <div class="tab active" data-mode="image">🖼️ 图像</div>
+      <div class="tab" data-mode="video">🎬 视频</div>
+    </div>
+
+    <!-- 图像面板 -->
+    <div class="card panel" id="panel-image">
+      <h2>② 图像生成</h2>
+      <p class="hint">只填提示词 = 文生图；上传参考图 = 图生图（基于参考图编辑/重绘）。</p>
+      <div class="field">
+        <label for="imgPrompt">提示词 Prompt</label>
+        <textarea id="imgPrompt" placeholder="例如：一名青少年在蓝色硬地网球场上正手击球，阳光，运动海报风格，OPeN STAR 品牌绿点缀"></textarea>
+      </div>
+      <div class="field">
+        <label>参考图（可选，图生图）</label>
+        <div class="drop" id="imgDrop">点击或拖拽上传图片（PNG/JPG/WebP）</div>
+        <input type="file" id="imgFile" accept="image/*" multiple hidden />
+        <div id="imgThumbs"></div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="imgSize">尺寸</label>
+          <select id="imgSize">
+            <option value="1024x1024">1024×1024 方形</option>
+            <option value="1536x1024">1536×1024 横版</option>
+            <option value="1024x1536">1024×1536 竖版</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="imgQuality">质量</label>
+          <select id="imgQuality">
+            <option value="high">高</option>
+            <option value="medium" selected>中</option>
+            <option value="low">低（更快更省）</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="imgN">数量</label>
+          <select id="imgN">
+            <option>1</option><option>2</option><option>3</option><option>4</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" id="imgBtn">生成图像</button>
+      <div class="status" id="imgStatus"></div>
+    </div>
+
+    <!-- 视频面板 -->
+    <div class="card panel" id="panel-video" style="display:none;">
+      <h2>② 视频生成（Sora）</h2>
+      <p class="hint">只填提示词 = 文生视频；上传参考图 = 图生视频（作为首帧）。生成需数十秒到几分钟。</p>
+      <div class="field">
+        <label for="vidPrompt">提示词 Prompt</label>
+        <textarea id="vidPrompt" placeholder="例如：教练在网球场边示范发球动作，慢镜头，镜头缓缓推进，阳光明媚"></textarea>
+      </div>
+      <div class="field">
+        <label>参考图 / 首帧（可选，图生视频）</label>
+        <div class="drop" id="vidDrop">点击或拖拽上传图片（PNG/JPG/WebP）</div>
+        <input type="file" id="vidFile" accept="image/*" hidden />
+        <div id="vidThumbs"></div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="vidModel">模型</label>
+          <select id="vidModel">
+            <option value="sora-2">sora-2（更快）</option>
+            <option value="sora-2-pro">sora-2-pro（更清晰）</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="vidSize">尺寸</label>
+          <select id="vidSize">
+            <option value="720x1280">720×1280 竖版</option>
+            <option value="1280x720">1280×720 横版</option>
+            <option value="1024x1792">1024×1792 竖版高清</option>
+            <option value="1792x1024">1792×1024 横版高清</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="vidSeconds">时长（秒）</label>
+          <select id="vidSeconds">
+            <option value="4">4</option>
+            <option value="8">8</option>
+            <option value="12">12</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" id="vidBtn">生成视频</button>
+      <div class="status" id="vidStatus"></div>
+      <div class="bar" id="vidBar" style="display:none;"><span></span></div>
+    </div>
+
+    <!-- 结果 -->
+    <div class="card">
+      <h2>③ 生成结果</h2>
+      <p class="hint" id="galleryHint">生成的图片 / 视频会显示在这里，可点击下载。</p>
+      <div class="gallery" id="gallery"></div>
+    </div>
+  </main>
+
+  <script>
+  (function () {
+    "use strict";
+    const $ = (id) => document.getElementById(id);
+    const DEFAULT_BASE = "https://api.openai.com/v1";
+
+    // ---- 密钥 / base url 持久化 ----
+    const keyInput = $("apiKey");
+    const baseInput = $("baseUrl");
+    keyInput.value = localStorage.getItem("os_openai_key") || "";
+    baseInput.value = localStorage.getItem("os_openai_base") || "";
+    keyInput.addEventListener("input", () => localStorage.setItem("os_openai_key", keyInput.value.trim()));
+    baseInput.addEventListener("input", () => localStorage.setItem("os_openai_base", baseInput.value.trim()));
+
+    const getBase = () => (baseInput.value.trim() || DEFAULT_BASE).replace(/\/+$/, "");
+    function getKey() {
+      const k = keyInput.value.trim();
+      if (!k) { throw new Error("请先在上方填入 OpenAI API Key。"); }
+      return k;
+    }
+
+    // ---- 标签切换 ----
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        const mode = tab.dataset.mode;
+        $("panel-image").style.display = mode === "image" ? "" : "none";
+        $("panel-video").style.display = mode === "video" ? "" : "none";
+      });
+    });
+
+    // ---- 文件上传封装（拖拽 + 点击 + 预览）----
+    function setupDrop(dropId, inputId, thumbsId, multiple) {
+      const drop = $(dropId), input = $(inputId), thumbs = $(thumbsId);
+      const state = { files: [] };
+      const render = () => {
+        thumbs.innerHTML = "";
+        state.files.forEach((f) => {
+          const img = document.createElement("img");
+          img.className = "thumb";
+          img.src = URL.createObjectURL(f);
+          thumbs.appendChild(img);
+        });
+        drop.classList.toggle("has", state.files.length > 0);
+        drop.textContent = state.files.length
+          ? `已选 ${state.files.length} 张（点击可重选）`
+          : "点击或拖拽上传图片（PNG/JPG/WebP）";
+      };
+      const accept = (fileList) => {
+        const arr = Array.from(fileList).filter((f) => f.type.startsWith("image/"));
+        state.files = multiple ? arr : arr.slice(0, 1);
+        render();
+      };
+      drop.addEventListener("click", () => input.click());
+      input.addEventListener("change", () => accept(input.files));
+      ["dragover", "dragenter"].forEach((e) =>
+        drop.addEventListener(e, (ev) => { ev.preventDefault(); drop.classList.add("has"); }));
+      drop.addEventListener("dragleave", () => render());
+      drop.addEventListener("drop", (ev) => { ev.preventDefault(); accept(ev.dataTransfer.files); });
+      return state;
+    }
+    const imgRef = setupDrop("imgDrop", "imgFile", "imgThumbs", true);
+    const vidRef = setupDrop("vidDrop", "vidFile", "vidThumbs", false);
+
+    // ---- 状态显示 ----
+    function setStatus(el, msg, isErr, spinner) {
+      el.classList.add("show");
+      el.classList.toggle("err", !!isErr);
+      el.innerHTML = (spinner ? '<span class="spinner"></span>' : "") + msg;
+    }
+    function clearStatus(el) { el.classList.remove("show", "err"); el.innerHTML = ""; }
+
+    // ---- 结果展示 ----
+    function addResult(kind, url, caption) {
+      const hint = $("galleryHint"); if (hint) hint.style.display = "none";
+      const box = document.createElement("div");
+      box.className = "result";
+      const media = kind === "video"
+        ? `<video src="${url}" controls playsinline></video>`
+        : `<img src="${url}" alt="result" />`;
+      const name = `openstar-${kind}-${caption}`;
+      box.innerHTML = `${media}<div class="meta"><small>${caption}</small>
+        <a class="dl btn ghost" style="padding:6px 10px;" href="${url}" download="${name}">下载</a></div>`;
+      $("gallery").prepend(box);
+    }
+
+    async function apiError(res) {
+      let detail = res.status + " " + res.statusText;
+      try {
+        const j = await res.json();
+        if (j.error && j.error.message) detail = j.error.message;
+      } catch (e) { /* ignore */ }
+      return new Error(detail);
+    }
+
+    // ---- 图像生成 ----
+    $("imgBtn").addEventListener("click", async () => {
+      const btn = $("imgBtn"), status = $("imgStatus");
+      const prompt = $("imgPrompt").value.trim();
+      if (!prompt) { setStatus(status, "请输入提示词。", true); return; }
+      let key;
+      try { key = getKey(); } catch (e) { setStatus(status, e.message, true); return; }
+
+      btn.disabled = true;
+      const hasRef = imgRef.files.length > 0;
+      setStatus(status, hasRef ? "正在基于参考图生成…" : "正在生成图像…", false, true);
+      try {
+        let res;
+        if (hasRef) {
+          const fd = new FormData();
+          fd.append("model", "gpt-image-1");
+          fd.append("prompt", prompt);
+          fd.append("size", $("imgSize").value);
+          fd.append("quality", $("imgQuality").value);
+          fd.append("n", $("imgN").value);
+          imgRef.files.forEach((f) => fd.append("image[]", f));
+          res = await fetch(getBase() + "/images/edits", {
+            method: "POST",
+            headers: { Authorization: "Bearer " + key },
+            body: fd,
+          });
+        } else {
+          res = await fetch(getBase() + "/images/generations", {
+            method: "POST",
+            headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "gpt-image-1",
+              prompt,
+              size: $("imgSize").value,
+              quality: $("imgQuality").value,
+              n: parseInt($("imgN").value, 10),
+            }),
+          });
+        }
+        if (!res.ok) throw await apiError(res);
+        const data = await res.json();
+        (data.data || []).forEach((item, i) => {
+          const src = item.b64_json
+            ? "data:image/png;base64," + item.b64_json
+            : item.url;
+          addResult("image", src, `img-${Date.now()}-${i}.png`);
+        });
+        clearStatus(status);
+      } catch (e) {
+        setStatus(status, "生成失败：" + e.message, true);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // ---- 视频生成（Sora）----
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    $("vidBtn").addEventListener("click", async () => {
+      const btn = $("vidBtn"), status = $("vidStatus"), bar = $("vidBar");
+      const prompt = $("vidPrompt").value.trim();
+      if (!prompt) { setStatus(status, "请输入提示词。", true); return; }
+      let key;
+      try { key = getKey(); } catch (e) { setStatus(status, e.message, true); return; }
+
+      btn.disabled = true;
+      bar.style.display = "block";
+      bar.firstElementChild.style.width = "0%";
+      setStatus(status, "正在提交生成任务…", false, true);
+      try {
+        // 1) 创建任务
+        const fd = new FormData();
+        fd.append("model", $("vidModel").value);
+        fd.append("prompt", prompt);
+        fd.append("size", $("vidSize").value);
+        fd.append("seconds", $("vidSeconds").value);
+        if (vidRef.files.length) fd.append("input_reference", vidRef.files[0]);
+
+        let res = await fetch(getBase() + "/videos", {
+          method: "POST",
+          headers: { Authorization: "Bearer " + key },
+          body: fd,
+        });
+        if (!res.ok) throw await apiError(res);
+        let job = await res.json();
+
+        // 2) 轮询
+        const started = Date.now();
+        while (job.status === "queued" || job.status === "in_progress") {
+          const pct = typeof job.progress === "number" ? job.progress : 0;
+          bar.firstElementChild.style.width = Math.max(pct, 3) + "%";
+          const secs = Math.round((Date.now() - started) / 1000);
+          setStatus(status, `生成中… ${pct || 0}%（已用时 ${secs}s，可能需要几分钟）`, false, true);
+          await sleep(4000);
+          res = await fetch(getBase() + "/videos/" + job.id, {
+            headers: { Authorization: "Bearer " + key },
+          });
+          if (!res.ok) throw await apiError(res);
+          job = await res.json();
+        }
+
+        if (job.status !== "completed") {
+          const msg = job.error && job.error.message ? job.error.message : "任务未成功完成";
+          throw new Error(msg);
+        }
+
+        // 3) 下载视频内容
+        bar.firstElementChild.style.width = "100%";
+        setStatus(status, "生成完成，正在下载视频…", false, true);
+        const contentRes = await fetch(getBase() + "/videos/" + job.id + "/content", {
+          headers: { Authorization: "Bearer " + key },
+        });
+        if (!contentRes.ok) throw await apiError(contentRes);
+        const blob = await contentRes.blob();
+        const url = URL.createObjectURL(blob);
+        addResult("video", url, `video-${job.id}.mp4`);
+        clearStatus(status);
+        bar.style.display = "none";
+      } catch (e) {
+        setStatus(status, "生成失败：" + e.message, true);
+        bar.style.display = "none";
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  })();
+  </script>
+</body>
+</html>
